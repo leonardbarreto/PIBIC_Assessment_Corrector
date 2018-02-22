@@ -1,0 +1,1 @@
+Tais comandos devem ser colocados dentro de um bloco try. Porque no caso de ocorrer uma exceção no bloco try, ela será lançada, os demais comandos do bloco serão suspensos, e o controle passará para o primeiro bloco catch que tenha um parâmetro de tipo compatível com a exceção lançada.
