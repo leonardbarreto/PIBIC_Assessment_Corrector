@@ -49,9 +49,6 @@ for r in respostas:
 		err = d.mistakes
 		print("\n\n",str_sentences," ~ ",err, "\n\n")
 	print("\n\nErros: ", len(sdoc.mistakes))
-#num_err_doc = len(errors)
-#print("Quantidade de erros: ",num_err_doc)
-#print("Erros: ",errors)
 
 #####################################################
 # ETAPA 1.ii) Verificar Similaridade entre documentos

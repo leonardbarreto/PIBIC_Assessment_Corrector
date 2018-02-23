@@ -1,8 +1,15 @@
+"""
+    Verificação de similaridade entre documentos por meio de 
+    comparações entre termos e strings.
+        entrada: lista de documentos
+        saída: documentos com as respectivas métricas de similaridade
+"""
 from __future__ import division
 import itertools
 import re
 from fuzzywuzzy import fuzz, process
 import jellyfish
+import numpy
 # a shingle in this code is a string with K-words
 
 K = 4
@@ -47,7 +54,7 @@ def calcula_similaridade(documents):
     # print("shingles=%s") %(shingles)
     
     combinations = list( itertools.combinations([x for x in range(len(shingles))], 2) )
-    print("combinations=",combinations)
+    #print("combinations=",combinations)
 
     # compare each pair in combinations tuple of shingles
     for c in combinations:
@@ -57,12 +64,38 @@ def calcula_similaridade(documents):
         #print(c,": jaccard=", jac)
 
     # Comparação de todo o documento (sem tokenizar) 
+    N = len(documents)
+
+    mtx_lv=numpy.empty((N,N,))
+    mtx_lv[:]=numpy.nan
+    mtx_jd=numpy.empty((N,N,))
+    mtx_jd[:]=numpy.nan
+    mtx_dlv=numpy.empty((N,N,))
+    mtx_dlv[:]=numpy.nan
+    mtx_jw=numpy.empty((N,N,))
+    mtx_jw[:]=numpy.nan
+    mtx_hd=numpy.empty((N,N,))
+    mtx_hd[:]=numpy.nan
+    mtx_mr=numpy.empty((N,N,))
+    mtx_mr[:]=numpy.nan
+    mtx_fuz=numpy.empty((N,N,))
+    mtx_fuz[:]=numpy.nan
+    
+
     comb = list(itertools.combinations([x for x in range(len(documents))],2))
-    print("comb=", comb)
+    #print("comb=", comb)
     for d in comb:
         i1 = d[0]
         i2 = d[1]
-        lv = jellyfish.levenshtein_distance(documents[i1],documents[i2])
+        #lv = jellyfish.levenshtein_distance(documents[i1],documents[i2])
+        mtx_lv[d[0]][d[1]]=jellyfish.levenshtein_distance(documents[i1],documents[i2])
+        mtx_jd[d[0]][d[1]]=jellyfish.jaro_distance(documents[i1],documents[i2]) 
+        mtx_dlv[d[0]][d[1]]=jellyfish.damerau_levenshtein_distance(documents[i1],documents[i2])
+        mtx_jw[d[0]][d[1]]=jellyfish.jaro_winkler(documents[i1],documents[i2]) 
+        mtx_hd[d[0]][d[1]]=jellyfish.hamming_distance(documents[i1],documents[i2]) 
+        mtx_mr[d[0]][d[1]]=jellyfish.match_rating_comparison(documents[i1],documents[i2]) 
+        mtx_fuz[d[0]][d[1]]= fuzz.ratio(documents[i1],documents[i2])
+        """
         print("\n\nlv dist",d,":\t\t",lv )
         jd = jellyfish.jaro_distance(documents[i1],documents[i2])
         print("jaro dist",d,":\t\t",jd )
@@ -76,3 +109,35 @@ def calcula_similaridade(documents):
         print("match_rat dist",d,":\t\t",mr )
         fuz = fuzz.ratio(documents[i1],documents[i2])
         print("fuzzy dist",d,":\t\t",fuz)
+        """
+    print("levenshtein_distance\n",mtx_lv)
+    print("\n\njaro distance\n",mtx_jd)
+    print("\n\ndemerau levenshtein distance\n",mtx_dlv)
+    print("\n\njaro winkler\n",mtx_jw)
+    print("\n\nhamming distance\n",mtx_hd)
+    print("\n\nmatch_rating\n",mtx_mr)
+    print("\n\nfuzz.ratio\n",mtx_fuz)
+
+    """
+    Módulo para a impressão dos gráficos
+import seaborn as sns
+import pandas as pd
+import matplotlib.pyplot as plt
+
+mtx_lv=np.tril(mtx_lv.T,1) #tranforma matriz diagonal superior em inferior para a plotagem
+
+sns.set(style="white")
+
+mask = numpy.zeros_like(mtx_lv, dtype=numpy.bool)
+mask[numpy.triu_indices_from(mask)] = True
+
+fig,ax = plt.subplots(figsize=(10,10))
+ax.set_title("levenshtein_distance")
+
+
+cmap = sns.diverging_palette(220, 10, as_cmap=True)
+
+sns.heatmap(mtx_lv, mask=mask, cmap=cmap, vmax=500, center=0,square=True, linewidths=.5, cbar_kws={"shrink": .5})
+
+plt.show()         
+    """
