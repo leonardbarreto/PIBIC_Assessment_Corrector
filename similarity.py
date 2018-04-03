@@ -117,9 +117,29 @@ def calcula_similaridade(documents):
     print("\n\nhamming distance\n",mtx_hd)
     print("\n\nmatch_rating\n",mtx_mr)
     print("\n\nfuzz.ratio\n",mtx_fuz)
+    import seaborn as sns
+    import pandas as pd
+    import matplotlib.pyplot as plt
+    
+    mtx_lv=numpy.tril(mtx_lv.T,1) #tranforma matriz diagonal superior em inferior para a plotagem
 
-    """
-    Módulo para a impressão dos gráficos
+    sns.set(style="white")
+
+    mask = numpy.zeros_like(mtx_lv, dtype=numpy.bool)
+    mask[numpy.triu_indices_from(mask)] = True
+
+    fig,ax = plt.subplots(figsize=(10,10))
+    ax.set_title("levenshtein_distance")
+
+
+    cmap = sns.diverging_palette(220, 10, as_cmap=True)
+
+    sns.heatmap(mtx_lv, mask=mask, cmap=cmap, vmax=500, center=0,square=True, linewidths=.5, cbar_kws={"shrink": .5})
+
+    plt.show()         
+    
+"""   
+#Módulo para a impressão dos gráficos
 import seaborn as sns
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -140,4 +160,4 @@ cmap = sns.diverging_palette(220, 10, as_cmap=True)
 sns.heatmap(mtx_lv, mask=mask, cmap=cmap, vmax=500, center=0,square=True, linewidths=.5, cbar_kws={"shrink": .5})
 
 plt.show()         
-    """
+"""  
