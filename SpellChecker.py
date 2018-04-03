@@ -17,6 +17,7 @@ from collections import Counter
 
 def words(text): return re.findall(r'\w+', text.lower())
 
+#Adaptar o uso para textos da área da temática abordada - Neste caso de informática
 WORDS = Counter(words(open('machado.txt').read()))
 
 def P(word, N=sum(WORDS.values())): 
